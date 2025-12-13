@@ -1,2 +1,5 @@
 hidden/
-test_*
+*.exe
+*.o
+*.swp
+.DS_Store
