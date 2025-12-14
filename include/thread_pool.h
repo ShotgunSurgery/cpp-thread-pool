@@ -14,8 +14,8 @@ public:
   ThreadPool(size_t no_of_threads);
   // this template is defined here because - Templates are compiled only when they are used, and the compiler must see the full
   // definition at that point. this is because a template is unlike a function which compiler calls knowing the signature, assumes it
-  // is defined somewhere and the linker later connects call to def
-  // invoke_result_t
+  // is defined somewhere and the linker later connects call to de
+
   // template <typename F, typename... Args> auto submit(F &&f, Args &&...args) { // std::packaged_task<R(Args...)> callable_object_name(function) here R is the return type of the function and Args... is
   //   // the parameter type of the arguments
   //   using R = std::invoke_result_t<F, Args...>;
@@ -39,6 +39,8 @@ public:
     // invoke_result_t determines what would be the return type if F was called with Args...
     using R = std::invoke_result_t<F, Args...>;
 
+    // if the function passed by submitter throws some exception then it's caught inside the packaged_task, stored in shared state 
+    // and later returned as it is
     auto task_ptr = std::make_shared<std::packaged_task<R()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
     std::future<R> fut = task_ptr->get_future();

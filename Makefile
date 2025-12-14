@@ -21,6 +21,12 @@ test_concurrency:
 test_shutdown:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SRC) tests/test_shutdown.cpp -o test_shutdown
 
+test_exceptions:
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SRC) tests/test_exceptions.cpp -o test_exceptions
+
+test_stress:
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SRC) tests/stress_test.cpp -o test_stress
+
 clean:
 	rm -f test_basic test_concurrency
 

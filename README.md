@@ -1,15 +1,91 @@
-## what is a thread pool anyway ? 
-A fix number of pre created threads that are initilized at the start of the program, then they sleep in a loop waiting for task and as a task arrivers it is pushed into a queue and a thread is woken up and assigned to one of the task and this keeps on happening till the pool is instructed to shutdown. Doing so solves a couple of problems - first of all creating and destroying threads as processes arrive and leave causes overhead and increases latency, also this ensures there is a cap to the number of threads in the system as a cpu can only run a specific number of threads at a time (depending upon the no. of cores) so the rest of them need to wait, more threads means more waiting means more switching means more overhead and the CPU spends more time in switching rather than actually doing the work. Also having too many threads destroyes cache locality as the cpu dumps cached data and loads new data every time a new thread gets scheduled.
+# C++ Thread Pool (C++17)
 
-## where are these used in real life ?
-- web servers 
-- game engines
-- database engines etc ...
+A minimal thread pool implementation with safe shutdown, exception propagation, and verified concurrency.
 
-## components of a thread pool 
-1. submit() - wraps a incomming task in a future mechanism, wakes up a sleeping thread
-2. queue - holds tasks until a worker becomes free
-3. worker threads - execute the task at hand
-4. conditional variable - it's job is to let the worker threads sleep without wasting the CPU resources and wake up instantly when a task arrives. It acts as a communication channel between the submit() and the worker threads
-5. mutex - it protects the queue ensuring two threads don't pop the same task, two submitters don't add the same task to the queue at diffrent times, the threads and submitters don't modify the queue simeltaneously 
-6. shutdown flag - notifies the worker threads to stop waiting for tasks and exit the loop
+---
+
+## Motivation
+
+### What is a thread pool anyway?
+
+A thread pool is a fixed number of pre-created threads that are initialized at the start of the program. These threads sleep in a loop while waiting for tasks. When a task arrives, it is pushed into a shared queue, and one of the sleeping threads is woken up and assigned the task. This process continues until the pool is instructed to shut down.
+
+This design solves several problems. Creating and destroying threads as requests arrive and leave introduces overhead and increases latency. A thread pool ensures there is a cap on the number of threads in the system, which is important because a CPU can only execute a limited number of threads at a time (depending on the number of cores). Having too many threads leads to excessive waiting, more context switching, and higher overhead, causing the CPU to spend more time switching between threads rather than doing useful work. Additionally, having too many threads destroys cache locality, as the CPU frequently evicts cached data and loads new data every time a different thread gets scheduled.
+
+### Where are these used in real life?
+
+- Web servers  
+- Game engines  
+- Database engines  
+
+---
+
+### Design Goals
+
+- Bounded number of worker threads  
+- Task-based execution model  
+- No busy-waiting  
+- Safe shutdown via RAII  
+- Exception-safe task execution  
+
+---
+
+### Components of a thread pool
+
+1. **submit()** — Wraps an incoming task using the future mechanism and wakes a sleeping worker thread.  
+2. **Queue** — Holds tasks until a worker becomes available.  
+3. **Worker threads** — Execute tasks pulled from the queue.  
+4. **Condition variable** — Allows worker threads to sleep without wasting CPU resources and wake up immediately when new tasks arrive. It acts as a communication channel between `submit()` and the worker threads.  
+5. **Mutex** — Protects the task queue, ensuring that multiple threads do not push or pop tasks simultaneously and that submitters and workers do not modify the queue concurrently.  
+6. **Shutdown flag** — Signals worker threads to stop waiting for new tasks and exit their execution loop during destruction.  
+
+---
+
+### Testing Strategy
+
+| Test               | Purpose                            |
+| ------------------ | ---------------------------------- |
+| `test_basic`       | Correct task execution & futures   |
+| `test_concurrency` | Parallel execution proof           |
+| `test_shutdown`    | Safe destruction with active tasks |
+| `test_exceptions`  | Exception propagation              |
+| `stress_test`      | High-load correctness              |
+
+---
+
+### Build and Run Instructions
+
+**Requirements**
+- C++17-compatible compiler (tested with `g++`)
+- POSIX-compatible system (Linux)
+- `make`
+
+**Build**
+All builds are handled via the provided `Makefile`.
+
+To see available targets:
+```bash
+make
+
+---
+
+### Limitations and Future Work
+
+**Current limitations**
+
+- Fixed-size thread pool (no dynamic resizing of worker threads)
+- Single global task queue (no work-stealing or per-thread queues)
+- FIFO scheduling only (no task priorities)
+- No task cancellation support
+- No explicit `wait_for_all()` or barrier API
+- No CPU affinity or NUMA-aware scheduling
+
+**Possible future extensions**
+
+- Dynamic scaling of worker threads based on load
+- Work-stealing queues to reduce contention
+- Task prioritization
+- Graceful task cancellation
+- Barrier / synchronization primitives (e.g., `wait_for_all()`)
+- Performance benchmarking and profiling
+
