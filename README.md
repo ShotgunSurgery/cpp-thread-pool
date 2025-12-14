@@ -20,7 +20,7 @@ This design solves several problems. Creating and destroying threads as requests
 
 ---
 
-### Design Goals
+## Design Goals
 
 - Bounded number of worker threads  
 - Task-based execution model  
@@ -30,7 +30,7 @@ This design solves several problems. Creating and destroying threads as requests
 
 ---
 
-### Components of a thread pool
+## Components of a Thread Pool
 
 1. **submit()** — Wraps an incoming task using the future mechanism and wakes a sleeping worker thread.  
 2. **Queue** — Holds tasks until a worker becomes available.  
@@ -41,7 +41,7 @@ This design solves several problems. Creating and destroying threads as requests
 
 ---
 
-### Testing Strategy
+## Testing Strategy
 
 | Test               | Purpose                            |
 | ------------------ | ---------------------------------- |
@@ -51,41 +51,20 @@ This design solves several problems. Creating and destroying threads as requests
 | `test_exceptions`  | Exception propagation              |
 | `stress_test`      | High-load correctness              |
 
+Each test is built as a separate executable and focuses on validating a single property of the thread pool.
+
 ---
 
-### Build and Run Instructions
+## Build and Run Instructions
 
-**Requirements**
+### Requirements
 - C++17-compatible compiler (tested with `g++`)
 - POSIX-compatible system (Linux)
 - `make`
 
-**Build**
+### Build
 All builds are handled via the provided `Makefile`.
 
 To see available targets:
 ```bash
 make
-
----
-
-### Limitations and Future Work
-
-**Current limitations**
-
-- Fixed-size thread pool (no dynamic resizing of worker threads)
-- Single global task queue (no work-stealing or per-thread queues)
-- FIFO scheduling only (no task priorities)
-- No task cancellation support
-- No explicit `wait_for_all()` or barrier API
-- No CPU affinity or NUMA-aware scheduling
-
-**Possible future extensions**
-
-- Dynamic scaling of worker threads based on load
-- Work-stealing queues to reduce contention
-- Task prioritization
-- Graceful task cancellation
-- Barrier / synchronization primitives (e.g., `wait_for_all()`)
-- Performance benchmarking and profiling
-
