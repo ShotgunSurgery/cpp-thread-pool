@@ -1,5 +1,10 @@
-hidden/
-*.exe
+# Test executables (built in repo root)
+test_*
+
+# Build artifacts
 *.o
+*.exe
+
+# Editor / OS noise
 *.swp
 .DS_Store

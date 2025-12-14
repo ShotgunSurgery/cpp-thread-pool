@@ -34,7 +34,9 @@ public:
   //   return fut;
   // }
 
+  // in this case F is the type of callabe and Args... is a pack of arguments passed to it
   template <typename F, typename... Args> auto submit(F &&f, Args &&...args) {
+    // invoke_result_t determines what would be the return type if F was called with Args...
     using R = std::invoke_result_t<F, Args...>;
 
     auto task_ptr = std::make_shared<std::packaged_task<R()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));

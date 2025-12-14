@@ -18,6 +18,9 @@ test_basic:
 test_concurrency:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SRC) $(TEST_CONCURRENCY) -o test_concurrency
 
+test_shutdown:
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SRC) tests/test_shutdown.cpp -o test_shutdown
+
 clean:
 	rm -f test_basic test_concurrency
 
