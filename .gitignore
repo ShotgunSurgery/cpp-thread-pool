@@ -1,10 +1,13 @@
-# Test executables (built in repo root)
-test_*
+# Ignore ONLY root-level test executables
+/test_*
 
 # Build artifacts
 *.o
 *.exe
 
-# Editor / OS noise
+# Hidden directory
+hidden/
+
+# Editor / OS junk
 *.swp
 .DS_Store
